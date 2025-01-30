@@ -3,7 +3,9 @@ const express = require("express");
 const redis = require("redis");
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
+console.log("PORT", PORT);
+
 const CACHE_EXPIRY = process.env.CACHE_EXPIRY || 600;
 
 // Create Redis client
