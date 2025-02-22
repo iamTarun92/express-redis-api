@@ -4,13 +4,10 @@ const redis = require("redis");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-console.log("PORT", PORT);
-
 const CACHE_EXPIRY = process.env.CACHE_EXPIRY || 600;
 
 // Create Redis client
 const redisClient = redis.createClient();
-
 // Handle Redis connection
 redisClient
   .connect()
@@ -31,7 +28,7 @@ const heavyComputation = () => {
 };
 
 // Route with Redis caching
-app.get("/redis", async (req, res) => {
+app.get("/api/redis", async (req, res) => {
   try {
     const cacheKey = "X-Data";
 
@@ -66,13 +63,17 @@ app.delete("/clear-cache", async (req, res) => {
 });
 
 // Route without Redis caching
-app.get("/", (req, res) => {
+app.get("/api", (req, res) => {
   try {
     const data = heavyComputation();
     res.json({ data });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
+});
+
+app.get("/", (req, res) => {
+  res.send("Hello World");
 });
 
 // Graceful shutdown
@@ -82,6 +83,14 @@ process.on("SIGINT", async () => {
   process.exit(0);
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running at http://localhost:${PORT}`);
-});
+const start = async () => {
+  try {
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Error starting server:", error);
+  }
+};
+
+start();
